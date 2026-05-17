@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const Version = "0.1.0"
+var Version = "dev" // overridden at build time via -X ldflags by GoReleaser
 
 // Config holds application-wide settings populated from CLI flags.
 type Config struct {
