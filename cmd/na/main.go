@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	cfg := config.Default()
+	cfg := config.Parse()
 
 	col, err := collector.New(cfg)
 	if err != nil {

@@ -43,6 +43,8 @@ func New(col collector.Collector, store *model.Store, cfg *config.Config) Model 
 		interval:  time.Duration(cfg.Interval * float64(time.Second)),
 		cfg:       cfg,
 		showList:  true,
+		useBits:   cfg.UseBits,
+		useSI:     cfg.UseSI,
 	}
 }
 
