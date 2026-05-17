@@ -27,7 +27,9 @@ type Model struct {
 	interval      time.Duration
 	cfg           *config.Config
 	showHelp      bool
-	showGraph     int // 0=off 1=RX only 2=RX+TX
+	showGraph     int  // 0=off 1=RX only 2=RX+TX
+	showDetails   bool // extended counters panel
+	showList      bool // interface list panel
 	useBits       bool
 	useSI         bool
 	err           error // last collector error, shown in the status bar
@@ -40,6 +42,7 @@ func New(col collector.Collector, store *model.Store, cfg *config.Config) Model 
 		collector: col,
 		interval:  time.Duration(cfg.Interval * float64(time.Second)),
 		cfg:       cfg,
+		showList:  true,
 	}
 }
 
@@ -88,6 +91,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.showHelp = false
 			return m, nil
 		}
+		names := m.store.Names()
 		switch msg.String() {
 		case "q", "ctrl+c":
 			return m, tea.Quit
@@ -95,12 +99,27 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.showHelp = true
 		case "g":
 			m.showGraph = (m.showGraph + 1) % 3
+		case "d":
+			m.showDetails = !m.showDetails
+		case "b":
+			m.useBits = !m.useBits
+		case "s":
+			m.useSI = !m.useSI
+		case "l":
+			m.showList = !m.showList
+		case "r":
+			if m.selected < len(names) {
+				m.store.ResetStats(names[m.selected])
+			}
+		case "+":
+			m.interval = min(60*time.Second, m.interval+500*time.Millisecond)
+		case "-":
+			m.interval = max(100*time.Millisecond, m.interval-500*time.Millisecond)
 		case "up", "k":
 			if m.selected > 0 {
 				m.selected--
 			}
 		case "down", "j":
-			names := m.store.Names()
 			if m.selected < len(names)-1 {
 				m.selected++
 			}
@@ -120,23 +139,40 @@ func (m Model) View() string {
 	}
 
 	bodyH := m.height - 2 // subtract header and status bar rows
-	rightW := m.width - listWidth - 1
 
-	left := renderIfList(m, bodyH)
-
-	var right string
-	if m.showGraph > 0 {
-		gh := graphLines * m.showGraph
-		statsH := max(0, bodyH-gh)
-		right = lipgloss.JoinVertical(lipgloss.Left,
-			renderGraph(m, rightW, gh),
-			renderStats(m, rightW, statsH),
-		)
-	} else {
-		right = renderStats(m, rightW, bodyH)
+	rightW := m.width
+	var left string
+	if m.showList {
+		rightW = m.width - listWidth - 1
+		left = renderIfList(m, bodyH)
 	}
 
-	body := lipgloss.JoinHorizontal(lipgloss.Top, left, right)
+	// build right panel top-to-bottom: graph → stats → details
+	remainH := bodyH
+	var rightParts []string
+
+	if m.showGraph > 0 {
+		gh := min(graphLines*m.showGraph, remainH)
+		rightParts = append(rightParts, renderGraph(m, rightW, gh))
+		remainH -= gh
+	}
+	if m.showDetails && remainH > 0 {
+		statsH := remainH * 2 / 3
+		detailsH := remainH - statsH
+		rightParts = append(rightParts, renderStats(m, rightW, statsH))
+		rightParts = append(rightParts, renderDetails(m, rightW, detailsH))
+	} else if remainH > 0 {
+		rightParts = append(rightParts, renderStats(m, rightW, remainH))
+	}
+
+	right := lipgloss.JoinVertical(lipgloss.Left, rightParts...)
+
+	var body string
+	if m.showList {
+		body = lipgloss.JoinHorizontal(lipgloss.Top, left, right)
+	} else {
+		body = right
+	}
 
 	return lipgloss.JoinVertical(lipgloss.Left,
 		renderHeader(m),
