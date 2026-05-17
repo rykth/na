@@ -65,6 +65,17 @@ func TestCounterReset(t *testing.T) {
 	}
 }
 
+func TestCounterUnsignedWrapAround(t *testing.T) {
+	// Simulate a uint64 counter that rolled over from near-max back to a small value.
+	// Unsigned subtraction: uint64(99) - uint64(MaxUint64-100) = 200.
+	var c Counter
+	c.Update(^uint64(0)-100, t0) // MaxUint64 - 100
+	c.Update(99, t0.Add(time.Second))
+	if c.Rate != 200.0 {
+		t.Errorf("expected rate 200.0 after wrap-around, got %f", c.Rate)
+	}
+}
+
 func TestCounterAccumulates(t *testing.T) {
 	var c Counter
 	c.Update(0, t0)

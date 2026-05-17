@@ -2,7 +2,7 @@ package ui
 
 import "github.com/charmbracelet/lipgloss"
 
-const listWidth = 30 // columns reserved for the left interface-list panel
+const listWidth = 38 // columns reserved for the left interface-list panel
 
 var (
 	styleHeader = lipgloss.NewStyle().

@@ -75,11 +75,6 @@ func renderIfLine(m Model, name string, selected bool) string {
 	line := fmt.Sprintf("%s%-8s ↓ %-10s ↑ %-10s %s",
 		prefix, displayName, rxStr, txStr, state)
 
-	// trim to listWidth to avoid wrapping
-	if len(line) > listWidth {
-		line = line[:listWidth]
-	}
-
 	if selected {
 		return styleSelected.Render(line)
 	}
