@@ -2,7 +2,7 @@
 
 package linux
 
-import "github.com/rickKoch/na/internal/collector"
+import "github.com/rykth/na/internal/collector"
 
 func init() {
 	collector.Register("linux", New)

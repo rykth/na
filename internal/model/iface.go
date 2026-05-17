@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rickKoch/na/internal/collector"
+	"github.com/rykth/na/internal/collector"
 )
 
 // Interface holds the live state of one network interface: metadata from

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rickKoch/na/internal/collector"
+	"github.com/rykth/na/internal/collector"
 )
 
 func makeSnap(name string, rxBytes, txBytes uint64) collector.RawIfStats {

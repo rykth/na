@@ -3,8 +3,8 @@
 package linux
 
 import (
-	"github.com/rickKoch/na/internal/collector"
-	"github.com/rickKoch/na/internal/config"
+	"github.com/rykth/na/internal/collector"
+	"github.com/rykth/na/internal/config"
 )
 
 // LinuxCollector reads network statistics from /proc and /sys on Linux.

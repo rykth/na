@@ -3,7 +3,7 @@ package collector
 import (
 	"fmt"
 
-	"github.com/rickKoch/na/internal/config"
+	"github.com/rykth/na/internal/config"
 )
 
 // RawIfStats is a single kernel snapshot for one network interface.

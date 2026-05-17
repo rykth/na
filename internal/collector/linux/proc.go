@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rickKoch/na/internal/collector"
+	"github.com/rykth/na/internal/collector"
 )
 
 // parseProcNetDev parses the contents of /proc/net/dev from r.
