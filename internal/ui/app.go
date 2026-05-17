@@ -27,6 +27,7 @@ type Model struct {
 	interval      time.Duration
 	cfg           *config.Config
 	showHelp      bool
+	showGraph     int // 0=off 1=RX only 2=RX+TX
 	useBits       bool
 	useSI         bool
 	err           error // last collector error, shown in the status bar
@@ -92,6 +93,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case "?", "h":
 			m.showHelp = true
+		case "g":
+			m.showGraph = (m.showGraph + 1) % 3
 		case "up", "k":
 			if m.selected > 0 {
 				m.selected--
@@ -120,7 +123,19 @@ func (m Model) View() string {
 	rightW := m.width - listWidth - 1
 
 	left := renderIfList(m, bodyH)
-	right := renderStats(m, rightW, bodyH)
+
+	var right string
+	if m.showGraph > 0 {
+		gh := graphLines * m.showGraph
+		statsH := max(0, bodyH-gh)
+		right = lipgloss.JoinVertical(lipgloss.Left,
+			renderGraph(m, rightW, gh),
+			renderStats(m, rightW, statsH),
+		)
+	} else {
+		right = renderStats(m, rightW, bodyH)
+	}
+
 	body := lipgloss.JoinHorizontal(lipgloss.Top, left, right)
 
 	return lipgloss.JoinVertical(lipgloss.Left,
